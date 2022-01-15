@@ -1,9 +1,10 @@
 import { txClient, queryClient, MissingWalletError, registry } from './module';
 // @ts-ignore
 import { SpVuexError } from '@starport/vuex';
+import { Commit } from "./module/types/scavenge/commit";
 import { Params } from "./module/types/scavenge/params";
 import { Scavenge } from "./module/types/scavenge/scavenge";
-export { Params, Scavenge };
+export { Commit, Params, Scavenge };
 async function initTxClient(vuexGetters) {
     return await txClient(vuexGetters['common/wallet/signer'], {
         addr: vuexGetters['common/env/apiTendermint']
@@ -40,7 +41,10 @@ const getDefaultState = () => {
         Params: {},
         Scavenge: {},
         ScavengeAll: {},
+        Commit: {},
+        CommitAll: {},
         _Structure: {
+            Commit: getStructure(Commit.fromPartial({})),
             Params: getStructure(Params.fromPartial({})),
             Scavenge: getStructure(Scavenge.fromPartial({})),
         },
@@ -85,6 +89,18 @@ export default {
                 params.query = null;
             }
             return state.ScavengeAll[JSON.stringify(params)] ?? {};
+        },
+        getCommit: (state) => (params = { params: {} }) => {
+            if (!params.query) {
+                params.query = null;
+            }
+            return state.Commit[JSON.stringify(params)] ?? {};
+        },
+        getCommitAll: (state) => (params = { params: {} }) => {
+            if (!params.query) {
+                params.query = null;
+            }
+            return state.CommitAll[JSON.stringify(params)] ?? {};
         },
         getTypeStructure: (state) => (type) => {
             return state._Structure[type].fields;
@@ -163,6 +179,38 @@ export default {
             }
             catch (e) {
                 throw new SpVuexError('QueryClient:QueryScavengeAll', 'API Node Unavailable. Could not perform query: ' + e.message);
+            }
+        },
+        async QueryCommit({ commit, rootGetters, getters }, { options: { subscribe, all } = { subscribe: false, all: false }, params, query = null }) {
+            try {
+                const key = params ?? {};
+                const queryClient = await initQueryClient(rootGetters);
+                let value = (await queryClient.queryCommit(key.index)).data;
+                commit('QUERY', { query: 'Commit', key: { params: { ...key }, query }, value });
+                if (subscribe)
+                    commit('SUBSCRIBE', { action: 'QueryCommit', payload: { options: { all }, params: { ...key }, query } });
+                return getters['getCommit']({ params: { ...key }, query }) ?? {};
+            }
+            catch (e) {
+                throw new SpVuexError('QueryClient:QueryCommit', 'API Node Unavailable. Could not perform query: ' + e.message);
+            }
+        },
+        async QueryCommitAll({ commit, rootGetters, getters }, { options: { subscribe, all } = { subscribe: false, all: false }, params, query = null }) {
+            try {
+                const key = params ?? {};
+                const queryClient = await initQueryClient(rootGetters);
+                let value = (await queryClient.queryCommitAll(query)).data;
+                while (all && value.pagination && value.pagination.next_key != null) {
+                    let next_values = (await queryClient.queryCommitAll({ ...query, 'pagination.key': value.pagination.next_key })).data;
+                    value = mergeResults(value, next_values);
+                }
+                commit('QUERY', { query: 'CommitAll', key: { params: { ...key }, query }, value });
+                if (subscribe)
+                    commit('SUBSCRIBE', { action: 'QueryCommitAll', payload: { options: { all }, params: { ...key }, query } });
+                return getters['getCommitAll']({ params: { ...key }, query }) ?? {};
+            }
+            catch (e) {
+                throw new SpVuexError('QueryClient:QueryCommitAll', 'API Node Unavailable. Could not perform query: ' + e.message);
             }
         },
         async sendMsgSubmitScavenge({ rootGetters }, { value, fee = [], memo = '' }) {

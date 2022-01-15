@@ -2,6 +2,7 @@ import { Reader, Writer } from "protobufjs/minimal";
 import { Params } from "../scavenge/params";
 import { Scavenge } from "../scavenge/scavenge";
 import { PageRequest, PageResponse } from "../cosmos/base/query/v1beta1/pagination";
+import { Commit } from "../scavenge/commit";
 export declare const protobufPackage = "cosmonaut.scavenge.scavenge";
 /** QueryParamsRequest is request type for the Query/Params RPC method. */
 export interface QueryParamsRequest {
@@ -22,6 +23,19 @@ export interface QueryAllScavengeRequest {
 }
 export interface QueryAllScavengeResponse {
     scavenge: Scavenge[];
+    pagination: PageResponse | undefined;
+}
+export interface QueryGetCommitRequest {
+    index: string;
+}
+export interface QueryGetCommitResponse {
+    commit: Commit | undefined;
+}
+export interface QueryAllCommitRequest {
+    pagination: PageRequest | undefined;
+}
+export interface QueryAllCommitResponse {
+    commit: Commit[];
     pagination: PageResponse | undefined;
 }
 export declare const QueryParamsRequest: {
@@ -66,6 +80,34 @@ export declare const QueryAllScavengeResponse: {
     toJSON(message: QueryAllScavengeResponse): unknown;
     fromPartial(object: DeepPartial<QueryAllScavengeResponse>): QueryAllScavengeResponse;
 };
+export declare const QueryGetCommitRequest: {
+    encode(message: QueryGetCommitRequest, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): QueryGetCommitRequest;
+    fromJSON(object: any): QueryGetCommitRequest;
+    toJSON(message: QueryGetCommitRequest): unknown;
+    fromPartial(object: DeepPartial<QueryGetCommitRequest>): QueryGetCommitRequest;
+};
+export declare const QueryGetCommitResponse: {
+    encode(message: QueryGetCommitResponse, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): QueryGetCommitResponse;
+    fromJSON(object: any): QueryGetCommitResponse;
+    toJSON(message: QueryGetCommitResponse): unknown;
+    fromPartial(object: DeepPartial<QueryGetCommitResponse>): QueryGetCommitResponse;
+};
+export declare const QueryAllCommitRequest: {
+    encode(message: QueryAllCommitRequest, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): QueryAllCommitRequest;
+    fromJSON(object: any): QueryAllCommitRequest;
+    toJSON(message: QueryAllCommitRequest): unknown;
+    fromPartial(object: DeepPartial<QueryAllCommitRequest>): QueryAllCommitRequest;
+};
+export declare const QueryAllCommitResponse: {
+    encode(message: QueryAllCommitResponse, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): QueryAllCommitResponse;
+    fromJSON(object: any): QueryAllCommitResponse;
+    toJSON(message: QueryAllCommitResponse): unknown;
+    fromPartial(object: DeepPartial<QueryAllCommitResponse>): QueryAllCommitResponse;
+};
 /** Query defines the gRPC querier service. */
 export interface Query {
     /** Parameters queries the parameters of the module. */
@@ -74,6 +116,10 @@ export interface Query {
     Scavenge(request: QueryGetScavengeRequest): Promise<QueryGetScavengeResponse>;
     /** Queries a list of Scavenge items. */
     ScavengeAll(request: QueryAllScavengeRequest): Promise<QueryAllScavengeResponse>;
+    /** Queries a Commit by index. */
+    Commit(request: QueryGetCommitRequest): Promise<QueryGetCommitResponse>;
+    /** Queries a list of Commit items. */
+    CommitAll(request: QueryAllCommitRequest): Promise<QueryAllCommitResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
@@ -81,6 +127,8 @@ export declare class QueryClientImpl implements Query {
     Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
     Scavenge(request: QueryGetScavengeRequest): Promise<QueryGetScavengeResponse>;
     ScavengeAll(request: QueryAllScavengeRequest): Promise<QueryAllScavengeResponse>;
+    Commit(request: QueryGetCommitRequest): Promise<QueryGetCommitResponse>;
+    CommitAll(request: QueryAllCommitRequest): Promise<QueryAllCommitResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
