@@ -1,10 +1,12 @@
 import { Params } from "../scavenge/params";
+import { Scavenge } from "../scavenge/scavenge";
 import { Writer, Reader } from "protobufjs/minimal";
 export declare const protobufPackage = "cosmonaut.scavenge.scavenge";
 /** GenesisState defines the scavenge module's genesis state. */
 export interface GenesisState {
-    /** this line is used by starport scaffolding # genesis/proto/state */
     params: Params | undefined;
+    /** this line is used by starport scaffolding # genesis/proto/state */
+    scavengeList: Scavenge[];
 }
 export declare const GenesisState: {
     encode(message: GenesisState, writer?: Writer): Writer;

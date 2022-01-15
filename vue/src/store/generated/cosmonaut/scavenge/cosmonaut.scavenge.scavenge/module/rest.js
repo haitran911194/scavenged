@@ -150,5 +150,34 @@ export class Api extends HttpClient {
             format: "json",
             ...params,
         });
+        /**
+         * No description
+         *
+         * @tags Query
+         * @name QueryScavengeAll
+         * @summary Queries a list of Scavenge items.
+         * @request GET:/cosmonaut/scavenge/scavenge/scavenge
+         */
+        this.queryScavengeAll = (query, params = {}) => this.request({
+            path: `/cosmonaut/scavenge/scavenge/scavenge`,
+            method: "GET",
+            query: query,
+            format: "json",
+            ...params,
+        });
+        /**
+         * No description
+         *
+         * @tags Query
+         * @name QueryScavenge
+         * @summary Queries a Scavenge by index.
+         * @request GET:/cosmonaut/scavenge/scavenge/scavenge/{index}
+         */
+        this.queryScavenge = (index, params = {}) => this.request({
+            path: `/cosmonaut/scavenge/scavenge/scavenge/${index}`,
+            method: "GET",
+            format: "json",
+            ...params,
+        });
     }
 }
